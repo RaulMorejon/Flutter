@@ -198,8 +198,17 @@ class GenerateFavoritesPage extends StatelessWidget{
         ),
       ),
       for (var pair in appState.favorites)
+
       ListTile(
-        leading: Icon(Icons.favorite),
+        leading: IconButton(
+          icon: Icon(Icons.favorite),
+          tooltip: "Eliminar de Favorits", // mostrara el missatge al passar per damunt
+          onPressed: (){ // es necesari per IconButton
+            
+          },
+        ),
+
+        
         title: Text(pair.asLowerCase), 
       ),]
     );
