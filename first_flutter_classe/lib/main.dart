@@ -65,10 +65,30 @@ class MyAppState extends ChangeNotifier {
       // si esta a la llista el treu ja que estaria marcada d'avants
       favorites.remove(current);
     } else {
-      favorites.add(current);
+      favorites.insert(0,current); // Cambio que s'afegeixi a d'alt per tindre les dos llistes iguals (gust personal)
     }
     notifyListeners();
   }
+
+  // Al ejecutar eliminarem la paraula de favorita en el cas que estigui en favorita en aquest moment
+  void EliminarFavorita(WordPair paraula) {
+    
+    // En cas de estar en favorits la treiem de fav
+    if (favorites.contains(paraula)) {
+      favorites.remove(paraula);
+
+      // Actualizar les d'historial i posar com no favorites
+      for (var i = 0; i < historial.length; i++) {
+        if (historial[i].paraula == paraula && historial[i].favorita) {
+          historial[i] = Historial(historial[i].paraula, false); // si es, la fiquem com NO favorita
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+
+
 
 } 
 
@@ -204,7 +224,7 @@ class GenerateFavoritesPage extends StatelessWidget{
           icon: Icon(Icons.favorite),
           tooltip: "Eliminar de Favorits", // mostrara el missatge al passar per damunt
           onPressed: (){ // es necesari per IconButton
-            
+             appState.EliminarFavorita(pair); // al presionar eliminara el favorit
           },
         ),
 
