@@ -45,11 +45,17 @@ class MyAppState extends ChangeNotifier {
   var favorites = <WordPair>[]; // Llista de paraules de tipus WordPair
 
 
-  var historial = <WordPair>[]; // Llista de totes les paraules 
+  //var historial = <WordPair>[]; // Llista de totes les paraules 
+
+  var historial = <Historial>[];
+
+
 
   void InsertarAlHistorial() {
     
-    historial.insert(0, current); // Fa que inserti al principi de la llista 
+    var esFavorita = favorites.contains(current); // mira la llista de fav
+    // Fa que inserti l'objecte de la paraula amb si es fav, al principi de la llista
+    historial.insert(0, Historial(current, esFavorita)); 
     notifyListeners();
   }
 
@@ -65,6 +71,19 @@ class MyAppState extends ChangeNotifier {
   }
 
 } 
+
+
+
+
+class Historial {
+  final WordPair paraula;
+  final bool favorita;
+  Historial(this.paraula, this.favorita);
+}
+  
+
+
+
  
 class MyHomePage extends StatefulWidget {
   @override
@@ -210,20 +229,25 @@ class GeneratorPage extends StatelessWidget {
         
           // historial
 
+
+
+
           Expanded(
             child: ListView(
-              
               children: [
                 if(!appState.historial.isEmpty)
                   for (var pair in appState.historial)
                       ListTile(
-                        leading: Icon(Icons.favorite_border),
-                        title: Text(pair.asLowerCase), 
+                        leading: Icon(pair.favorita ? Icons.favorite : Icons.favorite_border), // cambiem depenent si es o no fav
+                        title: Text(pair.paraula.asLowerCase), 
                       ),
               ],
             ),
           ),
          
+
+
+
 
           // Carta 
           BigCard(pair: pair),
