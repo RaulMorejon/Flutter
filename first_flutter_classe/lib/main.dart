@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
+
+
 void main() {
   runApp(MyApp());
 } 
@@ -25,17 +27,32 @@ class MyApp extends StatelessWidget {
       ),
     );
   } 
+
 }
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
+  
+  
 
   void getNext() {
+
     current = WordPair.random(); // obtenir nova paraula
+   
     notifyListeners(); // notificar als listeners
   }
 
   var favorites = <WordPair>[]; // Llista de paraules de tipus WordPair
+
+
+  var historial = <WordPair>[]; // Llista de totes les paraules 
+
+  void InsertarAlHistorial() {
+    
+    historial.insert(0, current); // Fa que inserti al principi de la llista 
+    notifyListeners();
+  }
+
 
   void toggleFavorite() {
     if (favorites.contains(current)) {
@@ -46,6 +63,7 @@ class MyAppState extends ChangeNotifier {
     }
     notifyListeners();
   }
+
 } 
  
 class MyHomePage extends StatefulWidget {
@@ -109,10 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
- 
- 
-
-
 @override
 Widget build (BuildContext context){
   var appState = context.watch<MyAppState>();
@@ -139,8 +153,8 @@ Widget build (BuildContext context){
   );
 
 }
-
-
+ 
+ 
 
 class GenerateFavoritesPage extends StatelessWidget{
 
@@ -157,25 +171,22 @@ class GenerateFavoritesPage extends StatelessWidget{
 
     return ListView(
      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text( // Cambiem el text amb un condicional ternari
-            appState.favorites.length == 1 ? "Tens 1 paraula favorita"
-                : "Tens ${appState.favorites.length} paraules favorites",   
-          ),
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          appState.favorites.length == 1 ? "Tens 1 paraula favorita"
+                      : "Tens ${appState.favorites.length} paraules favorites",
         ),
-        for (var pair in appState.favorites)
-          ListTile(
-            leading:  Icon  (Icons.favorite),
-            title: Text(pair.asLowerCase),   
-          )
-      ],
+      ),
+      for (var pair in appState.favorites)
+      ListTile(
+        leading: Icon(Icons.favorite),
+        title: Text(pair.asLowerCase), 
+      ),]
     );
- 
   }
+
 }
-
-
 
  
 class GeneratorPage extends StatelessWidget {
@@ -191,16 +202,36 @@ class GeneratorPage extends StatelessWidget {
       icon = Icons.favorite_border;
     } 
 
+
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+        
+        
+          // historial
+
+          Expanded(
+            child: ListView(
+              
+              children: [
+                if(!appState.historial.isEmpty)
+                  for (var pair in appState.historial)
+                      ListTile(
+                        leading: Icon(Icons.favorite_border),
+                        title: Text(pair.asLowerCase), 
+                      ),
+              ],
+            ),
+          ),
+         
+
+          // Carta 
           BigCard(pair: pair),
-          SizedBox(height: 40),
+          SizedBox(height: 40), 
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton.icon(
+              ElevatedButton.icon( 
                 onPressed: () {
                   appState.toggleFavorite();
                 },
@@ -210,6 +241,7 @@ class GeneratorPage extends StatelessWidget {
               SizedBox(width: 30),
               ElevatedButton(
                 onPressed: () {
+                  appState.InsertarAlHistorial();   // Insertem al historial 
                   appState.getNext();
                 },
                 child: Text('Next'),
@@ -241,6 +273,7 @@ class BigCard extends StatelessWidget {
       color: theme.colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(35.0),
+        
         child: Text(pair.asSnakeCase, style: style),
       ),
     );
